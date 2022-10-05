@@ -1,0 +1,2 @@
+ISim log file
+Running: C:\Projects\xil\l1_decoder_3_8\decoder_2_4_test_isim_beh.exe -intstyle ise -gui -tclbatch isim.cmd -wdb C:/Projects/xil/l1_decoder_3_8/decoder_2_4_test_isim_beh.wdb 
