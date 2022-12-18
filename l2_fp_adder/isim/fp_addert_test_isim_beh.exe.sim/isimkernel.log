@@ -2,14 +2,14 @@ Command line:
    fp_addert_test_isim_beh.exe
      -simmode  gui
      -simrunnum  0
-     -socket  49352
+     -socket  50037
 
-Mon Nov 28 00:20:37 2022
+Sun Dec 18 15:48:44 2022
 
 
- Elaboration Time: 0.109375 sec
+ Elaboration Time: 0.078125 sec
 
- Current Memory Usage: 675.283 Meg
+ Current Memory Usage: 675.279 Meg
 
  Total Signals          : 31
  Total Nets             : 109
@@ -20,9 +20,9 @@ Mon Nov 28 00:20:37 2022
  Total Traceable Variables  : 13
  Total Scalar Nets and Variables : 592
 
- Total Simulation Time: 0.484375 sec
+ Total Simulation Time: 0.140625 sec
 
- Current Memory Usage: 675.283 Meg
+ Current Memory Usage: 989.852 Meg
 
-Sun Dec 18 12:07:27 2022
+Sun Dec 18 15:49:27 2022
 

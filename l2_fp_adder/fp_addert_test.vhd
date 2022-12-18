@@ -86,38 +86,6 @@ BEGIN
    stim_proc: process
    begin
 		
-		-- same sign, same exp, different frac, no overflow
-		sign1 <= '0';
-		exp1 <= "0000";
-		frac1 <= "10101010";
-		
-		sign2 <= '0';
-		exp2 <= "0000";
-		frac2 <= "01010101";
-		
-		wait for 50 ns;
-		assert sign_out = '0';
-		assert exp_out = "0000";
-		assert frac_out = "11111111";
-		wait for 100 ns;
-		
-		
-		-- same sign, same exp, different frac, with overflow
-		sign1 <= '0';
-		exp1 <= "0000";
-		frac1 <= "11111111";
-		
-		sign2 <= '0';
-		exp2 <= "0000";
-		frac2 <= "00000001";
-		
-		wait for 50 ns;
-		assert sign_out = '0';
-		assert exp_out = "1000";
-		assert frac_out = "00000001";
-		wait for 100 ns;
-		
-		-- same sign, same exp, different frac, no overflow
 		sign1 <= '0';        -- +
 		exp1 <= "1011";      -- 7 + 4
 		frac1 <= "10000010"; -- 16,25 -> 10000,01

@@ -1,0 +1,1 @@
+-intstyle "ise" -incremental -lib "secureip" -o "C:/Projects/xil/l4_divider/l4_divider_tb_isim_beh.exe" -prj "C:/Projects/xil/l4_divider/l4_divider_tb_beh.prj" "work.l4_divider_tb" 
