@@ -1,44 +1,10 @@
---------------------------------------------------------------------------------
--- Company: 
--- Engineer:
---
--- Create Date:   14:23:17 12/18/2022
--- Design Name:   
--- Module Name:   C:/Projects/xil/l2_fp_adder/fp_adder_test_4.vhd
--- Project Name:  l2_fp_adder
--- Target Device:  
--- Tool versions:  
--- Description:   
--- 
--- VHDL Test Bench Created by ISE for module: fp_adder
--- 
--- Dependencies:
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
---
--- Notes: 
--- This testbench has been automatically generated using types std_logic and
--- std_logic_vector for the ports of the unit under test.  Xilinx recommends
--- that these types always be used for the top-level I/O of a design in order
--- to guarantee that the testbench will bind correctly to the post-implementation 
--- simulation model.
---------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
- 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---USE ieee.numeric_std.ALL;
- 
+
 ENTITY fp_adder_test_4 IS
 END fp_adder_test_4;
- 
-ARCHITECTURE behavior OF fp_adder_test_4 IS 
- 
-    -- Component Declaration for the Unit Under Test (UUT)
- 
+
+ARCHITECTURE behavior OF fp_adder_test_4 IS
     COMPONENT fp_adder
     PORT(
          sign1 : IN  std_logic;
@@ -52,7 +18,6 @@ ARCHITECTURE behavior OF fp_adder_test_4 IS
          frac_out : OUT  std_logic_vector(7 downto 0)
         );
     END COMPONENT;
-    
 
    --Inputs
    signal sign1 : std_logic := '0';
@@ -66,9 +31,9 @@ ARCHITECTURE behavior OF fp_adder_test_4 IS
    signal sign_out : std_logic;
    signal exp_out : std_logic_vector(3 downto 0);
    signal frac_out : std_logic_vector(7 downto 0);
- 
+
 BEGIN
- 
+
 	-- Instantiate the Unit Under Test (UUT)
    uut: fp_adder PORT MAP (
           sign1 => sign1,
@@ -84,22 +49,21 @@ BEGIN
 
    -- Stimulus process
    stim_proc: process
-   begin		
-      
+   begin
 		sign1 <= '1';        -- -
 		exp1 <= "1011";      -- 7 + 4
 		frac1 <= "10000010"; -- 16,25 -> 10000,01
-		
+
 		sign2 <= '1';        -- -
 		exp2 <= "1011";      -- 7 + 4
 		frac2 <= "10011110"; -- 19,75 -> 10011,11
-		
+
 		wait for 50 ns;
 		assert sign_out = '1';        -- -
 		assert exp_out = "1100";      -- 7 + 5
 		assert frac_out = "10010000"; -- 36 -> 100100
-		wait for 100 ns;
 
+		wait for 100 ns;
       wait;
    end process;
 

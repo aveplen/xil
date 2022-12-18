@@ -1,33 +1,6 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    12:09:03 12/18/2022 
--- Design Name: 
--- Module Name:    stack_module - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
-----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity stack_module is
 	generic(B: natural := 8; W: natural := 4);
@@ -54,85 +27,90 @@ architecture Behavioral of stack_module is
 	signal wr_en: STD_LOGIC;
 
 begin
-	--Регистровый файл
+	-- register file
 	process(clk, reset)
 	begin
-		if(reset = '1') then --Обнуление массива
+		if(reset = '1') then -- array nullification
 			 array_reg <= (others => (others => '0'));
 		elsif (rising_edge(clk)) then
-			if(wr_en = '1') then --Запись
+			if(wr_en = '1') then -- write
 				array_reg(to_integer(unsigned(w_ptr_reg))) <= w_data;
 			end if;
 		end if;
 	end process;
 
-	r_data <= array_reg(to_integer(unsigned(r_ptr_reg))); --Чтение
-	wr_en <= wr and (not full_reg); --Запись(только в том случае, если очередь неполна)
+	r_data <= array_reg(to_integer(unsigned(r_ptr_reg))); -- read
+	wr_en <= wr and (not full_reg); -- write (only if stack is empty)
 
-	--Контур управления указателями чтения и записи(LIFO-контроллер)
-	process(clk, reset) --Тактируемый процесс
+	-- pointer and read/write controller
+	process(clk, reset)
 		begin
-		if(reset ='1') then --Обнуление очереди
-			w_ptr_reg <= (others => '0'); --Сброс указателя записи
-			r_ptr_reg <= (others => '0'); --Сброс указателя чтения
+		if(reset ='1') then -- stack nullification
+			w_ptr_reg <= (others => '0'); -- write pointer reset
+			r_ptr_reg <= (others => '0'); -- read pointer reset
 			full_reg <= '0';
-			empty_reg <= '1'; --Пустая очередь
+			empty_reg <= '1'; -- empty flag true
 		elsif(rising_edge(clk)) then
-			w_ptr_reg <= w_ptr_next; --Перемещение указателя очереди
+			w_ptr_reg <= w_ptr_next; -- write pointer increment
 			r_ptr_reg <= r_ptr_next;
 			full_reg <= full_next;
 			empty_reg <= empty_next;
 		end if;
 	end process;
 
-	--Указатели на следующую позицию в очереди при записи
-	w_ptr_succ <= STD_LOGIC_VECTOR(unsigned(w_ptr_reg)+ 1); --Сдвигаем на позицию вперед
+	-- increment write pointer if writing
+	w_ptr_succ <= STD_LOGIC_VECTOR(unsigned(w_ptr_reg)+ 1);
 
-	--Указатели на предыдушую позицию в очереди при чтении
-	r_ptr_last <= STD_LOGIC_VECTOR(unsigned(w_ptr_reg)- 1); --Сдвигаем на позицию назад
+	-- decrement write pointer if reading
+	r_ptr_last <= STD_LOGIC_VECTOR(unsigned(w_ptr_reg)- 1); --пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
 	min <= (others => '0');
 	max <= (others => '1');
 
-	--Указатели на текущую позицию в очереди
-	wr_op <= wr & rd; --Комбинационный процесс next state logic
+	-- combine read/write flags into register
+	wr_op <= wr & rd;
 
 	process(w_ptr_reg, w_ptr_succ, r_ptr_reg, wr_op, full_reg, empty_reg, r_ptr_last)
 	begin
-		w_ptr_next <= w_ptr_reg; --Условия по-умолчанию
+		w_ptr_next <= w_ptr_reg; -- default value
 		r_ptr_next <= r_ptr_reg;
 		full_next <= full_reg;
 		empty_next <= empty_reg;
-		case wr_op is --Оператор выбора
-			when "00" => --Ничего не делать
-			
-			when "01" => --Читать
-				if(empty_reg /= '1') then --Очередь не пуста
+
+		case wr_op is -- decide from read/write register state
+			when "00" => -- do nothing
+
+			when "01" => -- read
+				if(empty_reg /= '1') then -- if stack is not empty
 					r_ptr_next <= r_ptr_last;
-					w_ptr_next <= r_ptr_reg; --Сдвигаем указателя чтения и записи на одну позицию назад
+					w_ptr_next <= r_ptr_reg; -- decrement read and write pointers
 					full_next <= '0';
-					if(r_ptr_reg = min) then --Извлечение элемента, который был единственным
+
+					if(r_ptr_reg = min) then -- take element if it was last
 						empty_next <= '1';
 					end if;
+
 				end if;
-				
-			when "10" => --Запись
-				if(full_reg /= '1') then --Очередь не полна
+
+			when "10" => -- write
+				if(full_reg /= '1') then -- if stack is not full
 					w_ptr_next <= w_ptr_succ;
 					r_ptr_next <= w_ptr_reg;
 					empty_next <= '0';
+
 					if(w_ptr_reg = max) then
 						full_next <= '1';
 					end if;
+
 				end if;
-				
-			when others =>
+
+			when others => -- do nothing
 				w_ptr_next <= w_ptr_reg;
 				r_ptr_next <= r_ptr_reg;
 		end case;
 	end process;
 
-	 --Выходной контур
+	 -- output
 	full <= full_reg;
 	empty <= empty_reg;
 

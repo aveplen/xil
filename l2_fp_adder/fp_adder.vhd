@@ -1,22 +1,3 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    21:21:52 11/27/2022 
--- Design Name: 
--- Module Name:    fp_adder - fp_adder 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
-----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -43,10 +24,10 @@ end fp_adder;
 
 architecture fp_adder_arch of fp_adder is
 
--- суффикс b соответствует большему числу
--- s - меньшему
--- a - выровненному
--- n - нормализованному
+-- prefix 'b' stands for bigger
+-- s - smaller
+-- a - adjusted
+-- n - normzlized
 
 signal signb, signs : std_logic;
 signal expb, exps, expn : unsigned(3 downto 0);
@@ -58,7 +39,7 @@ signal lead0 : unsigned(2 downto 0);
 
 begin
 
--- Сортировка
+-- sort
 process (sign1, sign2, exp1, exp2, frac1, frac2)
 begin
 	if ((exp1 & frac1) > (exp2 & frac2)) then
@@ -77,11 +58,11 @@ begin
 		fracs <= unsigned(frac1);
 	end if;
 end process;
-	
--- Выравнивание порядков
+
+-- exponent adjustment
 exp_diff <= expb - exps;
 with exp_diff select
-	fraca <= 
+	fraca <=
 		fracs                        when "0000",
 		'0' & fracs(7 downto 1)      when "0001",
 		"00" & fracs(7 downto 2)     when "0010",
@@ -92,10 +73,10 @@ with exp_diff select
 		"0000000" & fracs(7)         when "0111",
 		"00000000"                   when others;
 
--- Сложение со знаком
+-- signed addition
 sum <= ('0' & fracb) + ('0' & fracs) when (signb = signs) else ('0' & fracb) - ('0' & fracs);
 
--- Нормализация
+-- normalization
 lead0 <= "000" when (sum(7) = '1') else
          "001" when (sum(6) = '1') else
 			"010" when (sum(5) = '1') else
@@ -106,7 +87,7 @@ lead0 <= "000" when (sum(7) = '1') else
 			"111";
 
 with lead0 select
-	sum_norm <= 
+	sum_norm <=
 		sum(7 downto 0)             when "000",
 		sum(6 downto 0) & '0'       when "001",
 		sum(5 downto 0) & "00"      when "010",
@@ -115,7 +96,7 @@ with lead0 select
 		sum(2 downto 0) & "00000"   when "101",
 		sum(1 downto 0) & "000000"  when "110",
 		sum(0)          & "0000000" when others;
-		
+
 process (sum, sum_norm, expb, lead0)
 begin
 	if (sum(8) = '1') then
@@ -130,7 +111,7 @@ begin
 	end if;
 end process;
 
--- Вывод
+-- output
 sign_out <= signb;
 exp_out <= std_logic_vector(expn);
 frac_out <= std_logic_vector(fracn);
