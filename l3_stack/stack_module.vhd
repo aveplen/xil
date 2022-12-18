@@ -62,7 +62,7 @@ begin
 	w_ptr_succ <= STD_LOGIC_VECTOR(unsigned(w_ptr_reg)+ 1);
 
 	-- decrement write pointer if reading
-	r_ptr_last <= STD_LOGIC_VECTOR(unsigned(w_ptr_reg)- 1); --�������� �� ������� �����
+	r_ptr_last <= STD_LOGIC_VECTOR(unsigned(w_ptr_reg)- 1);
 
 	min <= (others => '0');
 	max <= (others => '1');
@@ -115,4 +115,3 @@ begin
 	empty <= empty_reg;
 
 end Behavioral;
-

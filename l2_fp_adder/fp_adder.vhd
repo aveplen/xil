@@ -1,14 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity fp_adder is
     Port ( sign1 : in  STD_LOGIC;
@@ -116,4 +108,3 @@ sign_out <= signb;
 exp_out <= std_logic_vector(expn);
 frac_out <= std_logic_vector(fracn);
 end fp_adder_arch;
-

@@ -1,108 +1,100 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    15:52:58 12/18/2022 
--- Design Name: 
--- Module Name:    l4_devider - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
-----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity l4_devider is
 	port(
-		 clk, setup: in STD_LOGIC;
-		 Divisible: in STD_LOGIC_VECTOR(3 downto 0);
-		 Divider: in STD_LOGIC_VECTOR(3 downto 0);
-		 Result: out STD_LOGIC_VECTOR(3 downto 0);
-		 ResultFrac: out STD_LOGIC_VECTOR(3 downto 0)
+		 clk: in std_logic;
+		 setup: in std_logic;
+		 divisible: in std_logic_vector(3 downto 0);
+		 divider: in std_logic_vector(3 downto 0);
+		 result: out std_logic_vector(3 downto 0);
+		 result_frac: out std_logic_vector(3 downto 0)
 	);
 end l4_devider;
 
 architecture Behavioral of l4_devider is
+	signal divisible_prev: std_logic_vector(3 downto 0);
+	signal divisible_next: std_logic_vector(3 downto 0);
 
-signal Dible_prev, Dible_next: STD_LOGIC_VECTOR(3 downto 0);
-signal M_Dible_prev, M_Dible_next: STD_LOGIC_VECTOR(3 downto 0);
-signal Result_prev, Result_next: STD_LOGIC_VECTOR(3 downto 0);
-signal fResult_prev, fResult_next: STD_LOGIC_VECTOR(3 downto 0);
-signal Step_prev, Step_next: unsigned(3 downto 0);
-signal sdvig_p, sdvig_n: STD_LOGIC;
+	signal m_divisible_prev: std_logic_vector(3 downto 0);
+	signal m_divisible_next: std_logic_vector(3 downto 0);
+
+	signal result_prev: std_logic_vector(3 downto 0);
+	signal result_next: std_logic_vector(3 downto 0);
+
+	signal float_result_prev: std_logic_vector(3 downto 0);
+	signal float_result_next: std_logic_vector(3 downto 0);
+
+	signal step_prev: unsigned(3 downto 0);
+	signal step_next: unsigned(3 downto 0);
+
+	signal shift_prev: std_logic;
+	signal shift_next: std_logic;
 
 begin
-	process(clk, setup, Divisible) begin
+	process(clk, setup, divisible) begin
 		if (setup = '1') then
-			Dible_prev <= Divisible;
-			M_Dible_prev <= "0000";
-			Result_prev <= "0000";
-			fResult_prev <= "0000";
-			Step_prev <= (others => '0');
-			sdvig_p <= '0';
+			divisible_prev <= divisible;
+			m_divisible_prev <= "0000";
+			result_prev <= "0000";
+			float_result_prev <= "0000";
+			step_prev <= (others => '0');
+			shift_prev <= '0';
+
 		elsif (clk'event and clk = '1') then
-			Dible_prev <= Dible_next;
-			M_Dible_prev <= M_Dible_next;
-			Result_prev <= Result_next;
-			fResult_prev <= fResult_next;
-			Step_prev <= Step_next;
-			sdvig_p <= sdvig_n;
+			divisible_prev <= divisible_next;
+			m_divisible_prev <= m_divisible_next;
+			result_prev <= result_next;
+			float_result_prev <= float_result_next;
+			step_prev <= step_next;
+			shift_prev <= shift_next;
 		end if;
 	end process;
 
-	process(Dible_prev, M_Dible_prev, Result_prev, Divider) begin
-		Dible_next <= Dible_prev;
-		M_Dible_next <= M_Dible_prev;
-		Result_next <= Result_prev;
-		fResult_next <= fResult_prev;
-		Step_next <= Step_prev;
-		sdvig_n <= sdvig_p;
-		
-		if (sdvig_p = '1') then
-			M_Dible_next <= M_Dible_prev(2 downto 0) & Dible_prev(3 downto 3);
-			sdvig_n <= '0';
+	process(divisible_prev, m_divisible_prev, result_prev, divider) begin
+		divisible_next <= divisible_prev;
+		m_divisible_next <= m_divisible_prev;
+		result_next <= result_prev;
+		float_result_next <= float_result_prev;
+		step_next <= step_prev;
+		shift_next <= shift_prev;
+
+		if (shift_prev = '1') then
+			m_divisible_next <= m_divisible_prev(2 downto 0) & divisible_prev(3 downto 3);
+			shift_next <= '0';
 		else
-			if (Step_prev <= 5) then
-				Step_next <= Step_prev + 1;
-				
-				if (M_Dible_prev >= Divider) then
-					Result_next <= Result_prev(2 downto 0) & "1";
-					M_Dible_next <= STD_LOGIC_VECTOR(unsigned(M_Dible_prev) - unsigned(Divider));
-					sdvig_n <= '1';
+			if (step_prev <= 5) then
+				step_next <= step_prev + 1;
+
+				if (m_divisible_prev >= divider) then
+					result_prev <= Result_prev(2 downto 0) & "1";
+					m_divisible_next <= std_logic_vector(unsigned(m_divisible_prev) - unsigned(divider));
+					shift_next <= '1';
 				else
-					Result_next <= Result_prev(2 downto 0) & "0";
-					M_Dible_next <= M_Dible_prev(2 downto 0) & Dible_prev(3 downto 3);
+					result_prev <= Result_prev(2 downto 0) & "0";
+					m_divisible_next <= m_divisible_prev(2 downto 0) & divisible_prev(3 downto 3);
 				end if;
 
-				Dible_next <= Dible_prev(2 downto 0) & "0";
-				Result <= Result_next;
-				
-			elsif (Step_prev <= 9) then
-				Step_next <= Step_prev + 1;
-				
-				if (M_Dible_prev >= Divider) then
-					fResult_next <= fResult_prev(2 downto 0) & "1";
-					M_Dible_next <= STD_LOGIC_VECTOR(unsigned(M_Dible_prev(3 downto 0)) - unsigned(Divider(3 downto 0)));
-					sdvig_n <= '1';
+				divisible_next <= divisible_prev(2 downto 0) & "0";
+				result <= result_prev;
+
+			elsif (step_prev <= 9) then
+				step_next <= step_prev + 1;
+
+				if (m_divisible_prev >= divider) then
+					float_result_next <= float_result_prev(2 downto 0) & "1";
+					m_divisible_next <= std_logic_vector(unsigned(m_divisible_prev(3 downto 0)) - unsigned(divider(3 downto 0)));
+					shift_next <= '1';
 				else
-					fResult_next <= fResult_prev(2 downto 0) & "0";
-					M_Dible_next <= M_Dible_prev(2 downto 0) & Dible_prev(3 downto 3);
+					float_result_next <= float_result_prev(2 downto 0) & "0";
+					m_divisible_next <= m_divisible_prev(2 downto 0) & divisible_prev(3 downto 3);
 				end if;
-				
-				Dible_next <= Dible_prev(2 downto 0) & "0";
-				ResultFrac <= fResult_next;
+
+				divisible_next <= divisible_prev(2 downto 0) & "0";
+				result_frac <= float_result_next;
 			end if;
 		end if;
 	end process;
-
 end Behavioral;
 
